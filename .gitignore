@@ -1,0 +1,41 @@
+# ---- Secrets: never commit these ----
+.env
+.env.*
+!.env.example
+*.pem
+*.p8
+*.p12
+*.key
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
+supabase/functions/.env
+supabase/.env
+
+# ---- Dependencies ----
+node_modules/
+
+# ---- Expo / React Native ----
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+/ios
+/android
+*.jks
+*.orig.*
+
+# ---- Supabase local state ----
+supabase/.branches/
+supabase/.temp/
+
+# ---- Tooling / OS ----
+.DS_Store
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+coverage/
+.vscode/
+.idea/
+*.tsbuildinfo
