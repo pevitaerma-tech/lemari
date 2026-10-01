@@ -54,10 +54,13 @@ Privacy is the core of this product. Treat these as hard rules.
 
 ## Database and code conventions
 
-- The Supabase project (region Central EU / Frankfurt) was created with **"Automatically expose new tables" OFF** and **"Enable automatic RLS" ON**. This means new tables are NOT reachable through the Data API by default: every migration that creates a table must explicitly `GRANT` the needed privileges to the `authenticated` role (and only to `anon` when truly needed), alongside its RLS policies. If the app gets "permission denied" errors, check grants first.
+- The Supabase project (region Southeast Asia / Singapore, chosen because the launch audience is mainly Indonesia and Malaysia) was created with **"Automatically expose new tables" OFF** and **"Enable automatic RLS" ON**. This means new tables are NOT reachable through the Data API by default: every migration that creates a table must explicitly `GRANT` the needed privileges to the `authenticated` role (and only to `anon` when truly needed), alongside its RLS policies. If the app gets "permission denied" errors, check grants first.
 - All database changes go through migration files in `supabase/migrations/`. Never change the production database by hand or run destructive commands (dropping tables, resetting data) against production without explicit approval.
 - Keep `docs/SCHEMA.md` updated with every table, what it's for, and its access rules in plain English.
 - Use a design token system (colors, typography, spacing) so branding can change without rewriting screens.
+- **Multi-language from day one.** The launch audience is mainly Indonesia and Malaysia. Support English and Bahasa Indonesia from the first screen, with Malay to follow. Never hardcode user-facing text in components; all text goes through a translation system. Handle dates, numbers and currencies (IDR, MYR, EUR, etc.) per locale. AI stylist replies should answer in the user's language.
+- **"LEMARI" is a working title.** Keep the app name in one central config so it can be renamed easily. Project accounts use the shared email pevitaerma@gmail.com. LEMARI is a joint project of Erma and her best friend Pevita.
+- **Privacy law:** the founders are based in the Netherlands (GDPR applies) and the main users are in Indonesia (PDP law) and Malaysia (PDPA). Flag anything with legal implications (consent, data transfers to AI providers, retention, deletion) so it can be checked with an advisor.
 - Use a development build (not only Expo Go) once native modules are needed, and say when that switch happens.
 
 ## Git

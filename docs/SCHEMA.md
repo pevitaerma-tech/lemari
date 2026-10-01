@@ -1,6 +1,6 @@
 # LEMARI — Database Schema
 
-*Status: **DESIGN DRAFT** · 1 Oct 2026 · No tables exist yet. Most tables are created in Phase 2 (privacy model first); the rest are added in the phase noted. This file must be updated with every migration.*
+*Status: **DESIGN DRAFT v2** · 1 Oct 2026 · Supabase project: Southeast Asia (Singapore). No tables exist yet. Most tables are created in Phase 2 (privacy model first); the rest are added in the phase noted. This file must be updated with every migration.*
 
 ## How to read this
 
@@ -8,7 +8,9 @@
 - **"Owner"** = the user who created the row. **"Friend"** = a user with an *accepted* connection to the owner.
 - Every table has RLS enabled. Your Supabase project doesn't expose new tables automatically, so every migration also `GRANT`s access to the `authenticated` role explicitly. The `anon` role (not logged in) gets **nothing** on any table.
 - 🔒 = owner-only table. Friends can never read it, even if they can see the related item.
-- Timestamps (`created_at`, `updated_at`) exist on every table and aren't repeated below.
+- Timestamps (`created_at`, `updated_at`) exist on every table and aren't repeated below. They're stored in UTC and shown in the user's time zone.
+- **Language-neutral codes:** fixed lists (category, subcategory, colors, material, pattern, silhouette, fit, style and season tags) are stored as codes like `top.blouse` or `color.navy`, never as English or Indonesian words. The app translates them. What users type themselves (title, brand, notes, messages) is stored exactly as typed.
+- **Money** is always stored as a number (`numeric`) + a 3-letter currency code (`IDR`, `MYR`, `EUR`, …), never as formatted text.
 
 ---
 
@@ -34,6 +36,16 @@ One row per user. Created automatically at sign-up.
 - **Change:** yourself only.
 - Deliberately **no** public username and no search, so nobody can be looked up.
 
+### `user_settings` 🔒 (Phase 1)
+Personal preferences. Kept apart from `profiles` so friends never see them.
+- Fields: `user_id`, `locale` (`en` · `id` · later `ms`), `country` (`ID` · `MY` · `NL` · …), `default_currency`, `time_zone` (e.g. `Asia/Jakarta`, `Asia/Makassar`, `Asia/Jayapura`, `Asia/Kuala_Lumpur`), `style_preferences` (JSON, e.g. modest)
+- **See / change:** yourself only. Server functions read `locale` and `time_zone` to send notifications, emails and AI replies in the right language at the right local time.
+
+### `consents` 🔒 (Phase 1)
+Proof of what each user agreed to, as required by GDPR, Indonesia's PDP law and Malaysia's PDPA.
+- Fields: `user_id`, `kind` (`privacy_policy` · `terms` · `ai_photo_processing` · `analytics` · `age_confirmation`), `version`, `locale` (the language the text was shown in), `granted_at`, `withdrawn_at`
+- **See:** yourself. **Change:** only via `record_consent` / `withdraw_consent`. Rows are never deleted while the account exists, so there's a history. Withdrawing AI consent blocks the AI functions for that user.
+
 ### `push_tokens` 🔒 (Phase 9)
 - Fields: `user_id`, `expo_push_token`, `platform`
 - **See / change:** yourself only. Used by server functions to send notifications.
@@ -42,6 +54,7 @@ One row per user. Created automatically at sign-up.
 Counts AI calls for quotas and cost tracking.
 - Fields: `user_id`, `kind` (`analyze_item`, `analyze_outfit`, `stylist`, …), `units`
 - **See:** yourself (so the app can show "3 scans left today"). **Change:** server only.
+- Holds counts only, never photos or prompts.
 
 ---
 
@@ -50,6 +63,7 @@ Counts AI calls for quotas and cost tracking.
 ### `items` (Phase 2)
 The shareable description of a garment, bag, pair of shoes or piece of jewelry.
 - Fields: `id`, `owner_id`, `title`, `category`, `subcategory`, `dominant_color`, `secondary_colors[]`, `material`, `pattern`, `silhouette`, `fit`, `brand` (user-entered only), `size`, `style_tags[]`, `season_tags[]`, `is_favorite`, `is_borrowable`, `visibility` (`private` · `circle` · `selected` · `ai_only`), `status` (`active` · `archived`)
+- **Codes:** `category`, `subcategory`, colors, `material`, `pattern`, `silhouette`, `fit`, tags are codes (see top). The category list includes regional wear (e.g. hijab/tudung, kebaya, batik, baju kurung, gamis, sarong; final list in Phase 2). Season tags include tropical ones (`hot_humid`, `rainy_season`, `air_conditioned_indoors`, `travel_cold_climate`).
 - **Default visibility:** `private`
 - **See:** anyone for whom `can_view_item` is true.
 - **Change:** owner only.
@@ -125,7 +139,7 @@ A look a friend builds from your wardrobe and sends to you.
 - **See:** same as the board, but each item still respects `can_view_item`.
 
 ### `stylist_conversations` / `stylist_messages` 🔒 (Phase 7)
-- Fields: `id`, `owner_id`, `role` (`user` · `assistant`), `content`, `suggested_outfit` (JSON of item IDs)
+- Fields: `id`, `owner_id`, `role` (`user` · `assistant`), `content`, `locale` (language of the reply), `suggested_outfit` (JSON of item IDs)
 - **See / change:** owner only. Auto-deleted after the retention period (decision D6).
 
 ### `inspirations` 🔒 / `inspiration_matches` 🔒 (Phase 8)
@@ -163,6 +177,7 @@ What one friend may do with *your* things. One direction only.
 ## Borrowing
 
 ### `borrow_requests` (Phase 2 tables, Phase 12 screens)
+- Dates are calendar dates in the owner's time zone (Indonesia alone has three time zones).
 - Fields: `id`, `item_id`, `owner_id`, `borrower_id`, `start_date`, `end_date`, `handover_method` (`pickup` · `ship`), `note`, `status`, timestamps per step
 - **Lifecycle:** `requested` → `approved` (reserved) **or** `declined` → `lent_out` → `returning` → `returned`. `cancelled` is possible before `lent_out`.
 - **Overlap protection:** the database refuses two `approved`/`lent_out`/`returning` borrows of the same item with overlapping dates (exclusion constraint).
@@ -233,3 +248,4 @@ For every table above, automated tests (`supabase/tests/database/`) check that:
 5. A **removed or blocked friend** immediately loses access.
 6. **Not logged in** (`anon`) gets nothing at all.
 7. **Storage** follows the same rules as the tables.
+8. **Settings and consents** are visible only to their owner.
