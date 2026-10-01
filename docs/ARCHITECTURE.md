@@ -506,7 +506,7 @@ All project accounts use **pevitaerma@gmail.com**. I'll give exact click-by-clic
 
 | Account | Needed by | Cost | What you'll give me |
 |---|---|---|---|
-| GitHub repo `pevitaerma/lemari` *(exists)* | Now | Free | Add the deploy key (steps in chat). Nothing else |
+| GitHub repo `pevitaerma-tech/lemari` *(exists)* | Now | Free | Add the deploy key (steps in chat). Nothing else |
 | Supabase *(project exists, Singapore)* | Phase 0 | Free → $25/mo | Project URL + **publishable (anon) key**. These are safe to share and are meant to be in the app. **Never** paste the service-role key into chat. |
 | Docker Desktop (installed on your Mac) | Phase 0 | Free for small businesses | Nothing. It runs a local copy of the database for privacy tests |
 | Expo account | Phase 0 | Free | The Expo username |
@@ -532,7 +532,7 @@ All project accounts use **pevitaerma@gmail.com**. I'll give exact click-by-clic
 - **D4** Vault screens in 1.1; Vault tables designed in Phase 2.
 - **D5** Photoroom for background removal to start.
 - **D6** Stylist chats auto-deleted after 90 days.
-- **D7** Private GitHub repo `pevitaerma/lemari` as online backup.
+- **D7** Private GitHub repo `pevitaerma-tech/lemari` as online backup.
 
 ### Open
 - **D8 Who "owns" the developer accounts?** Apple and Google accounts can be personal (one person's legal name shows as the seller) or an organisation (needs a registered company + D-U-N-S number, but Google's 12-tester rule doesn't apply). This depends on how you and Pevita set up the business. *(Recommendation: decide before Phase 1, when the Apple account is created. Ask your advisor whether a Dutch company, an Indonesian PT, or starting personal-then-transferring suits you best.)*
